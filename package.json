@@ -1,0 +1,24 @@
+{
+  "name": "dryad",
+  "version": "0.0.0",
+  "description": "A DSL to build JSON trees",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoho/dryad.git"
+  },
+  "keywords": [
+    "JSON",
+    "DSL",
+    "tree"
+  ],
+  "author": "Marat Abdullin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hoho/dryad/issues"
+  },
+  "homepage": "https://github.com/hoho/dryad"
+}
