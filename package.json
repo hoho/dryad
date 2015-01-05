@@ -4,7 +4,7 @@
   "description": "A DSL to build JSON trees",
   "main": "index.js",
   "scripts": {
-    "test": "gulp"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,16 @@
   "bugs": {
     "url": "https://github.com/hoho/dryad/issues"
   },
-  "homepage": "https://github.com/hoho/dryad"
+  "homepage": "https://github.com/hoho/dryad",
+  "dependencies": {
+    "commander": "~2.6.0",
+    "source-map": "~0.1.42"
+  },
+  "devDependencies": {
+    "mocha": "~2.1.0",
+    "should": "~4.4.2",
+    "gulp": "~3.8.10",
+    "gulp-eslint": "~0.2.0",
+    "assert-version": "~0.0.3"
+  }
 }
