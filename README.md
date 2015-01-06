@@ -67,13 +67,13 @@ Calling `tree1` function will produce the following JSON:
             "World"
         ],
         "WorldWorld": {
-            a: 9,
-            b: 8
+            "a": 9,
+            "b": 8
         },
         "key3": [
             "a",
             "b"
-        ]
+        ],
         "0.12117888359352946": 6
     }
 ]
