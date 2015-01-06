@@ -5,7 +5,7 @@ A DSL to build JSON trees.
 
 ## An example
 
-```json
+```
 tree1
     []
         "value"
