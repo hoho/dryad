@@ -71,8 +71,8 @@ Calling `tree1` function will produce the following JSON:
             "b": 8
         },
         "key3": [
-            "a",
-            "b"
+            9,
+            8
         ],
         "0.12117888359352946": 6
     }
