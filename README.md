@@ -41,11 +41,12 @@ tree2 $arg1 $arg2
             $key
                 ($val + $val)
         "key 2"
-            .books.title
-        .books[1].author[0]
+            <.books.title>
+        <.books[1].author[0]>
             $arg2
         "key3"
-            $arg2 .*
+            WITH $arg2
+                <.*>
         $arg1
             (1 + 2 + 3)
 ```
