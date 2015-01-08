@@ -8,8 +8,8 @@ A DSL to build JSON trees.
 ```
 tree1
     [] // Start an array.
-        "value" // String value (first array item).
-        [] // Array value (second array item).
+        "value" // String value (first item of the array).
+        [] // Array value (second item of the array).
             (1 + 2)  // JS expression in ().
             33 // Can skip () for the following JS expressions:
                //     - Single valid JS number
