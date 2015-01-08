@@ -3,7 +3,7 @@
 A DSL to build JSON trees.
 
 
-## An example
+## Example
 
 ```
 tree1
@@ -19,7 +19,8 @@ tree1
                //     - false
                //     - JS strings in double or single quotes.
 
-        // Call tree2 function and pass two arguments and a context object.
+        // Call tree2 function and pass two arguments and a context object (the
+        // result is the third item of the array).
         CALL tree2 arg1=(Math.random()) arg2=({a: 9, b: 8})
             {}  // Start an object.
                 "books"  // Key.
@@ -67,8 +68,10 @@ Calling `tree1` function will produce the following JSON:
 ```json
 [
     "value",
-    3,
-    33,
+    [
+        3,
+        33
+    ],
     {
         "key1": "value1",
         "aa": 222,
