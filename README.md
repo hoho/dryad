@@ -48,7 +48,7 @@ tree2 $arg1 $arg2
             $key
                 ($val + $val)
         "key 2"
-            <.books.title> // JSPath expression.
+            <.books.title> // JSPath expression over the context object.
         .books[1].author[0] // Can skip <> when JSPath expression starts with .
                             // and has no spaces on top level.
             $arg2
@@ -57,7 +57,7 @@ tree2 $arg1 $arg2
                 .*
         $arg1
             (1 + 2 + 3)
-        EACH .books.id // Iterate over context object properties.
+        EACH .books.id // Iterate over the context object properties.
             .[0]
                 (Math.random())
 ```
