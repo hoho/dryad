@@ -13,7 +13,7 @@ tree1
             (1 + 2)  // JS expression in ().
             33 // Can skip () for the following JS expressions:
                //     - Single valid JS number
-               //     - JS path starting with variable name: $param.prop['key 9']
+               //     - Single line JS path starting with variable name: $param.prop['key 9']
                //     - null
                //     - true
                //     - false
