@@ -54,7 +54,7 @@ tree2 $arg1 $arg2
             $arg2
         "key3"
             WITH $arg2
-                .*
+                .* // JSPath expression over the $arg2 variable value.
         $arg1
             (1 + 2 + 3)
         EACH .books.id // Iterate over the context object properties.
