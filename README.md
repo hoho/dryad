@@ -38,6 +38,8 @@ tree1
                             "title": "World"
                             "author": "WorldWorld"
 
+        CALL tree3 arg=true
+        CALL tree3 arg=false
 
 
 tree2 $arg1 $arg2
@@ -60,9 +62,21 @@ tree2 $arg1 $arg2
         EACH .books.id // Iterate over the context object properties.
             .[0]
                 (Math.random())
+
+
+tree3 $arg
+    // Conditionals and automatic string concatenation.
+    TEST $arg
+        "Ololo"
+    CHOOSE
+        WHEN $arg
+            "Alala"
+        OTHERWISE
+            "Ululu"
 ```
 
-Compiling this template gives two JavaScript functions: `tree1` and `tree2`.
+Compiling this template gives three JavaScript functions: `tree1`, `tree2` and
+`tree3`.
 Calling `tree1` function will produce the following JSON:
 
 ```json
@@ -91,6 +105,8 @@ Calling `tree1` function will produce the following JSON:
         "0.12117888359352946": 6,
         "1": 0.0637551280669868,
         "2": 0.2189847561530769
-    }
+    },
+    "OloloAlala",
+    "Ululu"
 ]
 ```
