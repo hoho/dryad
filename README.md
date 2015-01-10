@@ -40,6 +40,7 @@ tree1
 
         CALL tree3 arg=true
         CALL tree3 arg=false
+        CALL tree3 obj=true
 
 
 tree2 $arg1 $arg2
@@ -64,15 +65,36 @@ tree2 $arg1 $arg2
                 (Math.random())
 
 
-tree3 $arg
-    // Conditionals and automatic string concatenation.
-    TEST $arg
-        "Ololo"
+tree3 $arg $obj
+    // Variables, conditionals and automatic concatenation.
+    SET $tmp
+        TEST $arg
+            "Ololo"
+        CHOOSE
+            WHEN $arg
+                "Alala"
+            OTHERWISE
+                "Ululu"
+    SET $tmp2: 123
+    SET $tmp3
+        {}
+            "some": "object"
+            "with"
+                []
+                    "keys"
+                    "and"
+                    "values"
+
     CHOOSE
-        WHEN $arg
-            "Alala"
+        WHEN $obj
+            $tmp3
         OTHERWISE
-            "Ululu"
+            $tmp
+            $tmp2
+            "|"
+            ($tmp2 + ':' + $tmp)
+            "|"
+            $tmp3
 ```
 
 Compiling this template gives three JavaScript functions: `tree1`, `tree2` and
@@ -106,7 +128,15 @@ Calling `tree1` function will produce the following JSON:
         "1": 0.0637551280669868,
         "2": 0.2189847561530769
     },
-    "OloloAlala",
-    "Ululu"
+    "OloloAlala123|123:OloloAlala|[object Object]",
+    "Ululu123|123:Ululu|[object Object]",
+    {
+        "some": "object",
+        "with": [
+            "keys",
+            "and",
+            "values"
+        ]
+    }
 ]
 ```
