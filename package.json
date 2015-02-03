@@ -23,14 +23,15 @@
   "homepage": "https://github.com/hoho/dryad",
   "dependencies": {
     "commander": "~2.6.0",
-    "source-map": "~0.1.43"
+    "source-map": "~0.2.0",
+    "jspath": "~0.3.0",
+    "pegjs": "~0.8.0"
   },
   "devDependencies": {
     "mocha": "~2.1.0",
-    "should": "~4.4.4",
+    "should": "~4.6.3",
     "gulp": "~3.8.10",
-    "gulp-eslint": "~0.2.0",
-    "assert-version": "~0.0.3",
-    "jspath": "~0.3.0"
+    "gulp-eslint": "~0.2.2",
+    "assert-version": "~0.0.3"
   }
 }
