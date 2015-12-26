@@ -1,4 +1,12 @@
 /*
+ * Dryad Grammar
+ * =============
+ *
+ * Based on JavaScript Grammar from PEG.js examples:
+ * https://github.com/pegjs/pegjs/blob/master/examples/javascript.pegjs
+ */
+
+/*
  * JavaScript Grammar
  * ==================
  *
@@ -106,7 +114,8 @@
 
   var dryadCurrentBody;
   var dryadCurrentParent;
-  var indentationStack;
+  var dryadIndentationStack;
+  var dryadCurrentCommandState;
 
   dryadResetCurrentBody();
 
@@ -121,7 +130,8 @@
   function dryadResetCurrentBody() {
     dryadCurrentBody = [];
     dryadCurrentParent = dryadCurrentBody;
-    indentationStack = [{depth: 0}];
+    dryadCurrentCommandState = {};
+    dryadIndentationStack = [{depth: 0}];
   }
 
   function dryadGetCurrentBody() {
@@ -130,6 +140,18 @@
 
   function dryadAddCommand(cmd) {
     var newParent = [];
+    var cmdType = cmd.type;
+    var newState = {};
+
+    if (cmd.type === "value") {
+      cmdType = cmd.value.type;
+    }
+
+    newState.type = cmdType;
+    newState.command = cmd;
+    newState.parentState = dryadCurrentCommandState;
+
+    dryadContextDependentCommand(newState);
 
     dryadCurrentParent.push({
       command: cmd,
@@ -137,25 +159,113 @@
     });
 
     dryadCurrentParent = newParent;
+    dryadCurrentCommandState = newState;
   }
 
   function dryadIndentation(depth) {
-    if (depth > indentationStack[0].depth) {
-      indentationStack.unshift({depth: depth, parent: dryadCurrentParent});
+    if (depth > dryadIndentationStack[0].depth) {
+      dryadIndentationStack.unshift({
+        depth: depth,
+        parent: dryadCurrentParent,
+        state: dryadCurrentCommandState
+      });
     } else {
-      while (depth < indentationStack[0].depth) {
-        indentationStack.shift();
+      while (depth < dryadIndentationStack[0].depth) {
+        dryadIndentationStack.shift();
       }
 
-      if (depth !== indentationStack[0].depth) {
-        error("Bad indentation");
+      if (depth !== dryadIndentationStack[0].depth) {
+        dryadError("Bad indentation", null, location());
       }
 
-      dryadCurrentParent = indentationStack[0].parent;
+      dryadCurrentParent = dryadIndentationStack[0].parent;
+      dryadCurrentCommandState = dryadIndentationStack[0].state;
     }
   }
 
-  function dryadContextDependentCommand(name) {
+  function dryadGetStateWithConditionalsSkipped(state) {
+    var conditionals = {
+      test: true,
+      choose: true, when: true, otherwise: true,
+      with: true,
+      each: true
+    };
+    for (; state && (state.type in conditionals); state = state.parentState);
+    return state;
+  }
+
+  function dryadContextDependentCommand(newState) {
+    var parentState = newState.parentState;
+    var prevState = dryadGetStateWithConditionalsSkipped(parentState);
+
+    var ok = !parentState.oneLiner &&
+             (!parentState.allowed || (newState.type in parentState.allowed));
+
+    if (ok) {
+      switch (newState.type) {
+        case "expression":
+          newState.oneLiner = true;
+        case "array":
+        case "object":
+          if (prevState.type in {array: true, object: true}) { ok = false; }
+          break;
+        case "test":
+          break;
+        case "choose":
+          newState.allowed = {when: true, otherwise: true};
+          break;
+        case "when":
+          if (parentState.type !== "choose" || parentState.hasOtherwise) { ok = false; }
+          break;
+        case "otherwise":
+          if (parentState.type !== "choose" || parentState.hasOtherwise) { ok = false; }
+          parentState.hasOtherwise = true;
+          break;
+        case "set":
+          newState.oneLiner = !!newState.command.value;
+          break;
+        case "call":
+          break;
+        case "each":
+          break;
+        case "with":
+          break;
+        case "item":
+          if (prevState.type && (prevState.type !== "array")) { ok = false; }
+          newState.oneLiner = !!newState.command.value;
+          break;
+        case "kvpair":
+          if (prevState.type && (prevState.type !== "object")) { ok = false; }
+          newState.hasKey = !!newState.command.key;
+          newState.hasValue = !!newState.command.value;
+          newState.oneLiner = newState.hasKey && newState.hasValue;
+          newState.allowed = {kvkey: true, kvvalue: true};
+          break;
+        case "kvkey":
+          if (parentState.type !== "kvpair" || parentState.hasKey) { ok = false; }
+          parentState.hasKey = true;
+          newState.oneLiner = !!newState.command.key;
+          break;
+        case "kvvalue":
+          if (parentState.type !== "kvpair" || parentState.hasValue) { ok = false; }
+          parentState.hasValue = true;
+          newState.oneLiner = !!newState.command.value;
+          break;
+      }
+    }
+
+    if (!ok) {
+      dryadError("Unexpected command", null, newState.command.location);
+    };
+  }
+
+  function dryadError(message, expected, location) {
+    throw peg$buildException(
+      message,
+      expected,
+      input.substring(location.start.offset, location.end.offset),
+      location
+    );
   }
 }
 
@@ -222,7 +332,8 @@ DryadCommandLine
   }
 
 DryadCommand
-  = DryadValue
+  = cmd:(
+    DryadValue
   / DryadTestCommand
   / DryadChooseCommand
   / DryadChooseWhenCommand
@@ -231,6 +342,14 @@ DryadCommand
   / DryadCallCommand
   / DryadEachCommand
   / DryadWithCommand
+  / DryadArrayItem
+  / DryadKeyValuePair
+  / DryadKeyValueKey
+  / DryadKeyValueValue
+  ) {
+    cmd.location = location();
+    return cmd;
+  }
 
 DryadJavaScriptExpression
   = expr:(
@@ -317,6 +436,37 @@ DryadArgumentName "dryad argument name"
       name: name.name,
       location: location()
     };
+  }
+
+DryadArrayItem
+  = "ITEM" value:(____ DryadValue)? {
+    return {
+      type: "item",
+      value: value ? value[1].name : undefined
+    }
+  }
+
+DryadKeyValuePair
+  = "PAIR" key:(____ DryadValue)? value:(____ DryadValue)? {
+    return {
+      type: "kvpair",
+      key: key ? key[1] : undefined,
+      value: value ? value[1] : undefined
+    }
+  }
+DryadKeyValueKey
+  = "KEY" key:(____ DryadValue)? {
+    return {
+      type: "kvkey",
+      key: key ? key[1] : undefined
+    }
+  }
+DryadKeyValueValue
+  = "VALUE" value:(____ DryadValue)? {
+    return {
+      type: "kvvalue",
+      value: value ? value[1] : undefined
+    }
   }
 
 DryadValue "dryad value"
