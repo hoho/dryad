@@ -307,11 +307,13 @@ DryadFunctionNamePart
 
 DryadArgumentDeclaration
   = ____ name:DryadArgumentNameDeclaration value:(___ "=" ___ DryadArgumentValueDeclaration)? {
-    return {
+    var ret = {
       type: "DryadArgumentDeclaration",
-      name: name,
-      value: value ? value[3] : undefined
+      name: name.name,
+      location: name.location
     };
+    if (value) { ret.value = value[3]; }
+    return ret;
   }
 
 DryadArgumentNameDeclaration "dryad argument name declaration"
@@ -381,11 +383,12 @@ DryadChooseOtherwiseCommand
 
 DryadSetCommand
   = "SET" ____ name:DryadVariableName value:(____ DryadValue)? {
-    return {
+    var ret = {
       type: "set",
-      name: name.name,
-      value: value ? value[1] : undefined
+      name: name.name
     };
+    if (value) { ret.value = value[1]; }
+    return ret;
   }
 
 DryadCallCommand
@@ -400,25 +403,27 @@ DryadCallCommand
 
 DryadEachCommand
   = "EACH" key:(____ DryadVariableName)? value:(____ DryadVariableName)? ____ source:DryadValue {
+    var ret = {
+      type: "each",
+      source: source
+    };
     if (key && !value) {
       value = key;
       key = undefined;
     }
-    return {
-      type: "each",
-      key: key ? key[1].name : undefined,
-      value: value ? value[1].name : undefined,
-      source: source
-    };
+    if (key) { ret.key = key[1].name; }
+    if (value) { ret.value = value[1].name; }
+    return ret;
   }
 
 DryadWithCommand
   = "WITH" ____ source:DryadValue {
-    return {
+    var ret = {
       type: "with",
-      name: name.name,
-      value: value ? value[1] : undefined
+      name: name.name
     };
+    if (value) { ret.value = value[1]; }
+    return ret;
   }
 
 DryadVariableName "dryad variable name"
@@ -440,33 +445,37 @@ DryadArgumentName "dryad argument name"
 
 DryadArrayItem
   = "ITEM" value:(____ DryadValue)? {
-    return {
-      type: "item",
-      value: value ? value[1].name : undefined
-    }
+    var ret = {
+      type: "item"
+    };
+    if (value) { ret.value = value[1].name; }
+    return ret;
   }
 
 DryadKeyValuePair
   = "PAIR" key:(____ DryadValue)? value:(____ DryadValue)? {
-    return {
-      type: "kvpair",
-      key: key ? key[1] : undefined,
-      value: value ? value[1] : undefined
-    }
+    var ret = {
+      type: "kvpair"
+    };
+    if (key) { ret.key = key[1]; }
+    if (value) { ret.value = value[1]; }
+    return ret;
   }
 DryadKeyValueKey
   = "KEY" key:(____ DryadValue)? {
-    return {
-      type: "kvkey",
-      key: key ? key[1] : undefined
-    }
+    var ret = {
+      type: "kvkey"
+    };
+    if (key) { ret.key = key[1]; }
+    return ret;
   }
 DryadKeyValueValue
   = "VALUE" value:(____ DryadValue)? {
-    return {
-      type: "kvvalue",
-      value: value ? value[1] : undefined
-    }
+    var ret = {
+      type: "kvvalue"
+    };
+    if (value) { ret.value = value[1]; }
+    return ret;
   }
 
 DryadValue "dryad value"

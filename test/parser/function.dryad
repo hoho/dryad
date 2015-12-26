@@ -1,0 +1,18 @@
+func1
+    123
+
+func2 $arg1
+    "hello"
+
+func3 $arg1 $arg2 $arg3
+
+func4 $arg1=('default')
+    ('world')
+
+func5 $arg1=111 $arg2=true
+
+func6 $arg1 $arg2=(1 + 2)
+    "!!"
+    "??"
+
+func7 $arg1 $arg2 $arg3="some" $arg4='value'

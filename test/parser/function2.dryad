@@ -1,0 +1,42 @@
+// Comment
+
+/* Multiline
+   comment */
+
+// Comment
+func1 // Comment
+/* Multiline
+   comment */
+ // Comment
+    123// Comment
+    /* Multiline
+comment
+*/ // Comment
+
+func2/*Comment*/ /*Comment*/ /*Comment*/$arg1//Comment
+    "hello"
+/*Comment*/ /*Comment*/ /*Comment*/
+func3 /*Comment*/ /*Comment*/ /*Comment*/ $arg1 /*Comment*/ /*Comment*/ /*Comment*/ $arg2 /*Comment*/ /*Comment*/ /*Comment*/ $arg3 /*Comment*/ /*Comment*/ /*Comment*/ // Comment
+
+// Comment
+/*Comment
+Comment*/ /*Comment*/
+// Comment
+
+func4 $arg1/*Comment*/ /*Comment*/ /*Comment*/=/*Comment*/ /*Comment*/ /*Comment*/('default') //Comment
+    ('world')
+
+/*Comment*/ /*Comment*/ /*Comment*/
+/*Comment*/ /*Comment*/ /*Comment*/
+
+func5/*Comment*//*Comment*/ /*Comment*/$arg1=111/*Comment*/ /*Comment*/ /*Comment*/$arg2=true
+/*Comment*/ /*Comment*/ /*Comment*/
+func6 $arg1/*Comment*/ /*Comment*/ /*Comment*/$arg2/*Comment*/ /*Comment*/ /*Comment*/=(1 + 2)
+ /*Comment*/ /*Comment*/ /*Comment*/
+    "!!"//Comment
+       /*Comment*/ /*Comment*/ /*Comment*/
+    "??" // Comment
+  /*Comment*/ /*Comment*/ /*Comment*/
+/*Comment*/ /*Comment*/ /*Comment*/
+func7 $arg1 $arg2 $arg3="some" $arg4='value'
+  // Comment
