@@ -22,16 +22,17 @@
   },
   "homepage": "https://github.com/hoho/dryad",
   "dependencies": {
-    "commander": "~2.6.0",
-    "source-map": "~0.2.0",
-    "jspath": "~0.3.0",
-    "pegjs": "~0.8.0"
+    "commander": "~2.9.0",
+    "source-map": "~0.5.3",
+    "jspath": "~0.3.2"
   },
   "devDependencies": {
-    "mocha": "~2.1.0",
-    "should": "~4.6.3",
-    "gulp": "~3.8.10",
-    "gulp-eslint": "~0.2.2",
+    "pegjs": "~0.9.0",
+    "mocha": "~2.3.4",
+    "chai": "~3.4.1",
+    "gulp": "~3.9.0",
+    "gulp-mocha": "~2.2.0",
+    "gulp-eslint": "~1.1.1",
     "assert-version": "~0.0.3"
   }
 }
