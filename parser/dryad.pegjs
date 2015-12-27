@@ -333,7 +333,7 @@ DryadCommandLine
     dryadAddCommand(cmd);
   }
 
-DryadCommand
+DryadCommand "dryad command"
   = cmd:(
     DryadValue
   / DryadTestCommand
@@ -385,7 +385,7 @@ DryadSetCommand
   = "SET" ____ name:DryadVariableName value:(____ DryadValue)? {
     var ret = {
       type: "set",
-      name: name.name
+      name: name.value
     };
     if (value) { ret.value = value[1]; }
     return ret;
@@ -411,8 +411,8 @@ DryadEachCommand
       value = key;
       key = undefined;
     }
-    if (key) { ret.key = key[1].name; }
-    if (value) { ret.value = value[1].name; }
+    if (key) { ret.key = key[1].value; }
+    if (value) { ret.value = value[1].value; }
     return ret;
   }
 
@@ -430,7 +430,7 @@ DryadVariableName "dryad variable name"
   = "$" name:Identifier {
     return {
       type: "variable",
-      name: "$" + name.name
+      value: "$" + name.name
     };
   }
 
