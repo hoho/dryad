@@ -190,6 +190,46 @@ describe('Parser', function() {
             expect(getParsedCommand('$_')).to.deep.equal(getExpectedResult('$_', 'variable'));
         });
 
+        it('should parse JSPath expressions', function() {
+            expect(getParsedCommand('< .books..name >')).to.deep.equal(getExpectedResult(' .books..name ', 'jspath'));
+            expect(getParsedCommand('<^.automobiles{.maker === "Honda" && .year > 2009}.model>')).to.deep.equal(getExpectedResult('^.automobiles{.maker === "Honda" && .year > 2009}.model', 'jspath'));
+            expect(getParsedCommand('<(.property1 | ."pro-per-ty2" | .*)>')).to.deep.equal(getExpectedResult('(.property1 | ."pro-per-ty2" | .*)', 'jspath'));
+            expect(getParsedCommand('<.property1 | .property2.property2_1.property2_1_1>')).to.deep.equal(getExpectedResult('.property1 | .property2.property2_1.property2_1_1', 'jspath'));
+
+            expect(getParsedCommand('<.books{.author.name === "Robert C. Martin"}.title>')).to.deep.equal(getExpectedResult('.books{.author.name === "Robert C. Martin"}.title', 'jspath'));
+            expect(getParsedCommand('<.books{.price < 17}.title>')).to.deep.equal(getExpectedResult('.books{.price < 17}.title', 'jspath'));
+
+            expect(getParsedCommand('<.books[0].title>')).to.deep.equal(getExpectedResult('.books[0].title', 'jspath'));
+            expect(getParsedCommand('<.books.title[0]>')).to.deep.equal(getExpectedResult('.books.title[0]', 'jspath'));
+            expect(getParsedCommand('<.books[ -1 ].title>')).to.deep.equal(getExpectedResult('.books[ -1 ].title', 'jspath'));
+            expect(getParsedCommand('<.books[:2].title>')).to.deep.equal(getExpectedResult('.books[:2].title', 'jspath'));
+            expect(getParsedCommand('<.books[-2:].title>')).to.deep.equal(getExpectedResult('.books[-2:].title', 'jspath'));
+            expect(getParsedCommand('<.books[ 1 : 3 ].title>')).to.deep.equal(getExpectedResult('.books[ 1 : 3 ].title', 'jspath'));
+            expect(getParsedCommand('<.books{.price < 15}{.price > 5}[0].title>')).to.deep.equal(getExpectedResult('.books{.price < 15}{.price > 5}[0].title', 'jspath'));
+            expect(getParsedCommand('<.books{.author.name === $author}.title>')).to.deep.equal(getExpectedResult('.books{.author.name === $author}.title', 'jspath'));
+
+            expect(getParsedCommand('<.books{.id == "1"}>')).to.deep.equal(getExpectedResult('.books{.id == "1"}', 'jspath'));
+            expect(getParsedCommand('<.books{.id === "1"}>')).to.deep.equal(getExpectedResult('.books{.id === "1"}', 'jspath'));
+            expect(getParsedCommand('<.books{.id != "1"}>')).to.deep.equal(getExpectedResult('.books{.id != "1"}', 'jspath'));
+            expect(getParsedCommand('<.books{.id !== "1"}>')).to.deep.equal(getExpectedResult('.books{.id !== "1"}', 'jspath'));
+            expect(getParsedCommand('<.books{.id > "1"}>')).to.deep.equal(getExpectedResult('.books{.id > "1"}', 'jspath'));
+            expect(getParsedCommand('<.books{.id >= "1"}>')).to.deep.equal(getExpectedResult('.books{.id >= "1"}', 'jspath'));
+            expect(getParsedCommand('<.books{.id < "1"}>')).to.deep.equal(getExpectedResult('.books{.id < "1"}', 'jspath'));
+            expect(getParsedCommand('<.books{.id <= "1"}>')).to.deep.equal(getExpectedResult('.books{.id <= "1"}', 'jspath'));
+
+            expect(getParsedCommand('<.books{.title == "clean code"}>')).to.deep.equal(getExpectedResult('.books{.title == "clean code"}', 'jspath'));
+            expect(getParsedCommand('<.books{.title ^== "Javascript"}>')).to.deep.equal(getExpectedResult('.books{.title ^== "Javascript"}', 'jspath'));
+            expect(getParsedCommand('<.books{.title ^= "javascript"}>')).to.deep.equal(getExpectedResult('.books{.title ^= "javascript"}', 'jspath'));
+            expect(getParsedCommand('<.books{.title $== "Javascript"}>')).to.deep.equal(getExpectedResult('.books{.title $== "Javascript"}', 'jspath'));
+            expect(getParsedCommand('<.books{.title $= "javascript"}>')).to.deep.equal(getExpectedResult('.books{.title $= "javascript"}', 'jspath'));
+            expect(getParsedCommand('<.books{.title *== "Javascript"}>')).to.deep.equal(getExpectedResult('.books{.title *== "Javascript"}', 'jspath'));
+            expect(getParsedCommand('<.books{.title *= "javascript"}>')).to.deep.equal(getExpectedResult('.books{.title *= "javascript"}', 'jspath'));
+
+            expect(getParsedCommand('<.books{.price > 19 && .author.name === "Robert C. Martin"}>')).to.deep.equal(getExpectedResult('.books{.price > 19 && .author.name === "Robert C. Martin"}', 'jspath'));
+            expect(getParsedCommand('<.books{.title === "Maintainable JavaScript" || .title === "Clean Code"}>')).to.deep.equal(getExpectedResult('.books{.title === "Maintainable JavaScript" || .title === "Clean Code"}', 'jspath'));
+            expect(getParsedCommand('<.books{!.title}>')).to.deep.equal(getExpectedResult('.books{!.title}', 'jspath'));
+        });
+
         function getExpectedResult(expr, type) {
             return {
                 command: {

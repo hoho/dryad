@@ -376,8 +376,10 @@ DryadTestCommand
 
 DryadChooseCommand
   = "CHOOSE" { return {type: "choose"}; }
+
 DryadChooseWhenCommand
   = "WHEN" ____ expr:DryadValue { return {type: "when", condition: expr}; }
+
 DryadChooseOtherwiseCommand
   = "OTHERWISE" { return {type: "otherwise"}; }
 
@@ -461,6 +463,7 @@ DryadKeyValuePair
     if (value) { ret.value = value[1]; }
     return ret;
   }
+
 DryadKeyValueKey
   = "KEY" key:(____ DryadValue)? {
     var ret = {
@@ -469,6 +472,7 @@ DryadKeyValueKey
     if (key) { ret.key = key[1]; }
     return ret;
   }
+
 DryadKeyValueValue
   = "VALUE" value:(____ DryadValue)? {
     var ret = {
@@ -482,6 +486,7 @@ DryadValue "dryad value"
   = value:(
     DryadJavaScriptExpression
   / DryadVariableName
+  / DryadJSPathExpression
   ) {
     return {
       type: "value",
@@ -489,6 +494,84 @@ DryadValue "dryad value"
       location: location()
     };
   }
+
+DryadJSPathExpression "JSPath expression"
+  = "<" DryadJSPathConcatExpression ">" {
+    var ret = text();
+    return {
+      type: "jspath",
+      value: ret.substring(1, ret.length - 1)
+    };
+  }
+
+DryadJSPathConcatExpression
+  = WhiteSpace* DryadJSPathConcatPartExpression ("|" DryadJSPathConcatPartExpression)* WhiteSpace*
+
+DryadJSPathConcatPartExpression
+  = WhiteSpace* (DryadJSPathPathGroupExpression / DryadJSPathPath) WhiteSpace*
+
+DryadJSPathPathGroupExpression
+  = WhiteSpace* "(" DryadJSPathConcatExpression ")" DryadJSPathPredicate* WhiteSpace*
+
+DryadJSPathPath
+  = DryadJSPathSelector (DryadJSPathSelector / DryadJSPathPredicate)*
+
+DryadJSPathSelector
+  = WhiteSpace* (("^"? WhiteSpace* (".." / ".")) / "$") ("*" / Identifier / StringLiteral) WhiteSpace*
+
+DryadJSPathPredicate
+  = DryadJSPathObjectPredicate
+  / DryadJSPathPositionPredicate
+  / DryadJSPathPathGroupExpression
+
+DryadJSPathObjectPredicate
+  = WhiteSpace* "{" DryadJSPathLogicalORExpression "}" WhiteSpace*
+
+DryadJSPathLogicalORExpression
+  = WhiteSpace* DryadJSPathLogicalANDExpression ("||" DryadJSPathLogicalANDExpression)* WhiteSpace*
+
+DryadJSPathLogicalANDExpression
+  = WhiteSpace* DryadJSPathEqualityExpression ("&&" DryadJSPathEqualityExpression)* WhiteSpace*
+
+DryadJSPathEqualityExpression
+  = WhiteSpace* DryadJSPathRelationalExpression (DryadJSPathEqualityOperator DryadJSPathEqualityExpression)* WhiteSpace*
+
+DryadJSPathEqualityOperator
+  = "===" / "!==" / "^==" / "$==" / "*==" / "==" / "!=" / "^=" / "$=" / "*="
+
+DryadJSPathRelationalExpression
+  = WhiteSpace* DryadJSPathAdditiveExpression (DryadJSPathRelationalOperator DryadJSPathRelationalExpression)* WhiteSpace*
+
+DryadJSPathRelationalOperator
+  = "<=" / ">=" / "<" / ">"
+
+DryadJSPathAdditiveExpression
+  = WhiteSpace* DryadJSPathMultiplicativeExpression (("+" / "-") DryadJSPathAdditiveExpression)* WhiteSpace*
+
+DryadJSPathMultiplicativeExpression
+  = WhiteSpace* DryadJSPathUnaryExpression (("*" / "/" / "%") DryadJSPathMultiplicativeExpression)* WhiteSpace*
+
+DryadJSPathPositionPredicate
+  = WhiteSpace* "[" DryadJSPathPositionExpression "]" WhiteSpace*
+
+DryadJSPathPositionExpression
+  = DryadJSPathUnaryExpression ":" DryadJSPathUnaryExpression
+  / DryadJSPathUnaryExpression ":"
+  / ":" DryadJSPathUnaryExpression
+  / DryadJSPathUnaryExpression
+
+DryadJSPathUnaryExpression
+  = WhiteSpace* ("!" / "-")* WhiteSpace* DryadJSPathPrimaryExpression WhiteSpace*
+
+DryadJSPathPrimaryExpression
+  = StringLiteral
+  / NumericLiteral
+  / BooleanLiteral
+  / DryadJSPathPath
+  / DryadJSPathGroupExpression
+
+DryadJSPathGroupExpression
+ = "(" DryadJSPathLogicalORExpression ")"
 
 ___
   = (WhiteSpace / Comment)*
