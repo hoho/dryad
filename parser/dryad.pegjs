@@ -517,7 +517,13 @@ DryadJSPathPath
   = DryadJSPathSelector (DryadJSPathSelector / DryadJSPathPredicate)*
 
 DryadJSPathSelector
-  = WhiteSpace* (("^"? WhiteSpace* (".." / ".")) / "$") ("*" / Identifier / StringLiteral) WhiteSpace*
+  = WhiteSpace* (DryadJSPathSelectorProperty / DryadJSPathSelectorVariable) WhiteSpace*
+
+DryadJSPathSelectorProperty
+  = "^"? WhiteSpace* (".." / ".") ("*" / Identifier / StringLiteral)
+
+DryadJSPathSelectorVariable
+  = "$" (Identifier / StringLiteral)
 
 DryadJSPathPredicate
   = DryadJSPathObjectPredicate
