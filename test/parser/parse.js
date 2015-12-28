@@ -201,11 +201,11 @@ describe('Parser', function() {
 
             expect(getParsedCommand('<.books[0].title>')).to.deep.equal(getExpectedResult('.books[0].title', 'jspath'));
             expect(getParsedCommand('<.books.title[0]>')).to.deep.equal(getExpectedResult('.books.title[0]', 'jspath'));
-            expect(getParsedCommand('<.books[ -1 ].title>')).to.deep.equal(getExpectedResult('.books[ -1 ].title', 'jspath'));
+            expect(getParsedCommand('< .books [ -1 ] .title>')).to.deep.equal(getExpectedResult(' .books [ -1 ] .title', 'jspath'));
             expect(getParsedCommand('<.books[:2].title>')).to.deep.equal(getExpectedResult('.books[:2].title', 'jspath'));
             expect(getParsedCommand('<.books[-2:].title>')).to.deep.equal(getExpectedResult('.books[-2:].title', 'jspath'));
             expect(getParsedCommand('<.books[ 1 : 3 ].title>')).to.deep.equal(getExpectedResult('.books[ 1 : 3 ].title', 'jspath'));
-            expect(getParsedCommand('<.books{.price < 15}{.price > 5}[0].title>')).to.deep.equal(getExpectedResult('.books{.price < 15}{.price > 5}[0].title', 'jspath'));
+            expect(getParsedCommand('<.books{.price < 15} {.price > 5} [0].title>')).to.deep.equal(getExpectedResult('.books{.price < 15} {.price > 5} [0].title', 'jspath'));
             expect(getParsedCommand('<.books{.author.name === $author}.title>')).to.deep.equal(getExpectedResult('.books{.author.name === $author}.title', 'jspath'));
 
             expect(getParsedCommand('<.books{.id == "1"}>')).to.deep.equal(getExpectedResult('.books{.id == "1"}', 'jspath'));
