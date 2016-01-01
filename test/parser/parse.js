@@ -236,6 +236,21 @@ describe('Parser', function() {
             expect(getParsedCommand('TEST <.a.b.c> /* Comment */ // Comment \n // Lalala\n  TEST /*Ololo*/ (false || true) // Haha')).to.deep.equal(getExpectedTestResult('.a.b.c', 'jspath', [getExpectedTestResult('(false || true)')]));
         });
 
+        it('should parse СHOOSE command', function() {
+            expect(getParsedCommand('CHOOSE')).to.deep.equal(getExpectedChooseResult());
+            expect(getParsedCommand('CHOOSE\n  WHEN true\n    123\n  WHEN <.a{.b == .c}>\n    <.a>\n  OTHERWISE\n    "aaa"')).to.deep.equal(getExpectedChooseResult([
+                getChooseConditionResult('true', 'expression', [getExpectedValueResult('123')]),
+                getChooseConditionResult('.a{.b == .c}', 'jspath', [getExpectedValueResult('.a', 'jspath')]),
+                getChooseConditionResult(null, null, [getExpectedValueResult('"aaa"')])
+            ]));
+            expect(getParsedCommand('CHOOSE\n  OTHERWISE')).to.deep.equal(getExpectedChooseResult([
+                getChooseConditionResult()
+            ]));
+            expect(getParsedCommand('CHOOSE\n  WHEN (1 + 2)')).to.deep.equal(getExpectedChooseResult([
+                getChooseConditionResult('(1 + 2)')
+            ]));
+        });
+
         function getExpectedValueResult(expr, type) {
             return {
                 command: {
@@ -254,6 +269,26 @@ describe('Parser', function() {
                 },
                 children: children || []
             }
+        }
+
+        function getExpectedChooseResult(children) {
+            return {
+                command: {
+                    type: 'choose'
+                },
+                children: children || []
+            }
+        }
+
+        function getChooseConditionResult(conditionExpr, conditionType, children) {
+            var ret = {children: children || []};
+
+            ret.command = conditionExpr ?
+                {type: 'when', condition: getExpectedValueResult(conditionExpr, conditionType).command}
+                :
+                {type: 'otherwise'};
+
+            return ret;
         }
     });
 });
