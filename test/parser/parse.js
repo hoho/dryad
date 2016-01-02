@@ -251,6 +251,12 @@ describe('Parser', function() {
             ]));
         });
 
+        it('should parse SET command', function() {
+            expect(getParsedCommand('SET $tmp')).to.deep.equal(getExpectedSetResult('$tmp'));
+            expect(getParsedCommand('SET $tmp 123')).to.deep.equal(getExpectedSetResult('$tmp', getExpectedValueResult('123').command));
+            expect(getParsedCommand('SET $tmp\n  123')).to.deep.equal(getExpectedSetResult('$tmp', undefined, [getExpectedValueResult('123')]));
+        });
+
         function getExpectedValueResult(expr, type) {
             return {
                 command: {
@@ -288,6 +294,20 @@ describe('Parser', function() {
                 :
                 {type: 'otherwise'};
 
+            return ret;
+        }
+
+        function getExpectedSetResult(name, value, children) {
+            var ret = {
+                command: {
+                    type: 'set',
+                    name: name
+                },
+                children: children || []
+            };
+            if (value) {
+                ret.command.value = value;
+            }
             return ret;
         }
     });
