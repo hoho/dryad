@@ -257,6 +257,42 @@ describe('Parser', function() {
             expect(getParsedCommand('SET $tmp\n  123')).to.deep.equal(getExpectedSetResult('$tmp', undefined, [getExpectedValueResult('123')]));
         });
 
+        it('should parse CALL command', function() {
+            expect(getParsedCommand('CALL a-b-c')).to.deep.equal(getExpectedCallResult('a-b-c'));
+            expect(getParsedCommand('CALL a-b-c AS $tmp')).to.deep.equal(getExpectedCallResult('a-b-c', [], [], '$tmp'));
+            expect(getParsedCommand('CALL a-b-c 1 true null $v (1 + 2)')).to.deep.equal(getExpectedCallResult(
+                'a-b-c',
+                [
+                    getExpectedValueResult('1').command,
+                    getExpectedValueResult('true').command,
+                    getExpectedValueResult('null').command,
+                    getExpectedValueResult('$v', 'variable').command,
+                    getExpectedValueResult('(1 + 2)').command
+                ]
+            ));
+            expect(getParsedCommand('CALL a-b-c arg1=1 arg2=true arg3=$v')).to.deep.equal(getExpectedCallResult(
+                'a-b-c',
+                [],
+                [
+                    {name: 'arg1', value: getExpectedValueResult('1').command},
+                    {name: 'arg2', value: getExpectedValueResult('true').command},
+                    {name: 'arg3', value: getExpectedValueResult('$v', 'variable').command}
+                ]
+            ));
+            expect(getParsedCommand('CALL (1 + 2) 1 $v arg1=11 arg2=true AS $tmp')).to.deep.equal(getExpectedCallResult(
+                getExpectedValueResult('(1 + 2)').command,
+                [
+                    getExpectedValueResult('1').command,
+                    getExpectedValueResult('$v', 'variable').command
+                ],
+                [
+                    {name: 'arg1', value: getExpectedValueResult('11').command},
+                    {name: 'arg2', value: getExpectedValueResult('true').command}
+                ],
+                '$tmp'
+            ));
+        });
+
         function getExpectedValueResult(expr, type) {
             return {
                 command: {
@@ -307,6 +343,22 @@ describe('Parser', function() {
             };
             if (value) {
                 ret.command.value = value;
+            }
+            return ret;
+        }
+
+        function getExpectedCallResult(name, args, kwargs, asvar, children) {
+            var ret = {
+                command: {
+                    type: 'call',
+                    name: name,
+                    args: args || [],
+                    kwargs: kwargs || []
+                },
+                children: children || []
+            };
+            if (asvar) {
+                ret.command.asvar = asvar;
             }
             return ret;
         }

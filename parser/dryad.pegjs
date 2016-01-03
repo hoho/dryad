@@ -394,13 +394,15 @@ DryadSetCommand
   }
 
 DryadCallCommand
-  = "CALL" ____ name:(DryadFunctionName / DryadValue) args:(____ DryadValue)* kwargs:(____ DryadArgumentName ___ "=" ___ DryadValue)* {
-    return {
+  = "CALL" ____ name:(DryadFunctionName / DryadValue) args:(____ DryadValue)* kwargs:(____ DryadArgumentName ___ "=" ___ DryadValue)* asvar:(____ "AS" ____ DryadVariableName)? {
+    var ret = {
       type: "call",
       name: name,
       args: args.map(function(item) { return item[1]; }),
-      kwargs: kwargs.map(function(item) { return {name: item[1], value: item[5]}; })
+      kwargs: kwargs.map(function(item) { return {name: item[1].name, value: item[5]}; })
     };
+    if (asvar) { ret.asvar = asvar[3].value; }
+    return ret;
   }
 
 DryadEachCommand
