@@ -293,6 +293,12 @@ describe('Parser', function() {
             ));
         });
 
+        it('should parse EACH command', function() {
+            expect(getParsedCommand('EACH $key $value [1, 2]')).to.deep.equal(getExpectedEachResult('$key', '$value', getExpectedValueResult('[1, 2]', 'array').command));
+            expect(getParsedCommand('EACH $val ([])\n  $val')).to.deep.equal(getExpectedEachResult(undefined, '$val', getExpectedValueResult('([])', 'array').command, [getExpectedValueResult('$val', 'variable')]));
+        });
+
+
         function getExpectedValueResult(expr, type) {
             return {
                 command: {
@@ -360,6 +366,19 @@ describe('Parser', function() {
             if (asvar) {
                 ret.command.asvar = asvar;
             }
+            return ret;
+        }
+
+        function getExpectedEachResult(key, value, source, children) {
+            var ret = {
+                command: {
+                    type: 'each',
+                    source: source
+                },
+                children: children || []
+            };
+            if (key) { ret.command.key = key; }
+            if (value) { ret.command.value = value; }
             return ret;
         }
     });
