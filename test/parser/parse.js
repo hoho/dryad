@@ -296,6 +296,7 @@ describe('Parser', function() {
         it('should parse EACH command', function() {
             expect(getParsedCommand('EACH $key $value [1, 2]')).to.deep.equal(getExpectedEachResult('$key', '$value', getExpectedValueResult('[1, 2]', 'array').command));
             expect(getParsedCommand('EACH $val ([])\n  $val')).to.deep.equal(getExpectedEachResult(undefined, '$val', getExpectedValueResult('([])', 'array').command, [getExpectedValueResult('$val', 'variable')]));
+            expect(getParsedCommand('EACH $src')).to.deep.equal(getExpectedEachResult(undefined, undefined, getExpectedValueResult('$src', 'variable').command));
         });
 
 

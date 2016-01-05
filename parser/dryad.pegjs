@@ -406,7 +406,7 @@ DryadCallCommand
   }
 
 DryadEachCommand
-  = "EACH" key:(____ DryadVariableName)? value:(____ DryadVariableName)? ____ source:DryadValue {
+  = "EACH" key:(____ DryadVariableName !EOF)? value:(____ DryadVariableName !EOF)? ____ source:DryadValue {
     var ret = {
       type: "each",
       source: source
