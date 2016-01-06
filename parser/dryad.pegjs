@@ -328,15 +328,30 @@ DryadFunctionBody
   }
 
 DryadCommandLine
-  = spaces:" "+ ___ cmd:DryadCommand ___ {
+  = spaces:" "+ ___ cmd:DryadCommand ___ unexpected:DryadUnexpectedTail ___ {
+    if (cmd.error || unexpected.text.length) {
+      throw peg$buildException(
+        unexpected.text ? "Unexpected input" : "Incomplete command",
+        null,
+        unexpected.text,
+        unexpected.location
+      );
+    }
     dryadIndentation(spaces.length);
     dryadAddCommand(cmd);
   }
 
+DryadUnexpectedTail
+  = ret:(!LineTerminatorSequence .)* {
+    return {
+      text: text(),
+      location: location()
+    };
+  }
+
 DryadCommand "dryad command"
   = cmd:(
-    DryadValue
-  / DryadTestCommand
+    DryadTestCommand
   / DryadChooseCommand
   / DryadChooseWhenCommand
   / DryadChooseOtherwiseCommand
@@ -348,6 +363,7 @@ DryadCommand "dryad command"
   / DryadKeyValuePair
   / DryadKeyValueKey
   / DryadKeyValueValue
+  / DryadValue
   ) {
     cmd.location = location();
     return cmd;
@@ -406,10 +422,13 @@ DryadCallCommand
   }
 
 DryadEachCommand
-  = "EACH" key:(____ DryadVariableName !EOF)? value:(____ DryadVariableName !EOF)? ____ source:DryadValue {
+  = "EACH" key:(____ DryadVariableName !EOF)? value:(____ DryadVariableName !EOF)? source:(____ DryadValue)? {
+    if (!source) {
+      return {error: true};
+    }
     var ret = {
       type: "each",
-      source: source
+      source: source[1]
     };
     if (key && !value) {
       value = key;
