@@ -166,6 +166,8 @@ describe('Parser', function() {
             expect(getParsedCommand('12e3')).to.deep.equal(getExpectedValueResult('12e3'));
             expect(getParsedCommand('0x123')).to.deep.equal(getExpectedValueResult('0x123'));
             expect(getParsedCommand('/\\(/gi')).to.deep.equal(getExpectedValueResult('/\\(/gi'));
+            expect(function() { getParsedCommand('null aaa bbb'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aaa bbb'");
+            expect(function() { getParsedCommand('true false'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'false'");
         });
 
         it('should parse array literals', function() {
@@ -297,6 +299,10 @@ describe('Parser', function() {
             expect(getParsedCommand('EACH $key $value [1, 2]')).to.deep.equal(getExpectedEachResult('$key', '$value', getExpectedValueResult('[1, 2]', 'array').command));
             expect(getParsedCommand('EACH $val ([])\n  $val')).to.deep.equal(getExpectedEachResult(undefined, '$val', getExpectedValueResult('([])', 'array').command, [getExpectedValueResult('$val', 'variable')]));
             expect(getParsedCommand('EACH $src')).to.deep.equal(getExpectedEachResult(undefined, undefined, getExpectedValueResult('$src', 'variable').command));
+            expect(function() { getParsedCommand('EACH'); }).to.throw(dryad.SyntaxError, 'SyntaxError: Incomplete command');
+            expect(function() { getParsedCommand('EACH abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
+            expect(function() { getParsedCommand('EACH $a $b $c cde'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'cde'");
+            expect(function() { getParsedCommand('EACH $a cde $b'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'cde $b'");
         });
 
 

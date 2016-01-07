@@ -331,7 +331,7 @@ DryadCommandLine
   = spaces:" "+ ___ cmd:DryadCommand ___ unexpected:DryadUnexpectedTail ___ {
     if (cmd.error || unexpected.text.length) {
       throw peg$buildException(
-        unexpected.text ? "Unexpected input" : "Incomplete command",
+        unexpected.text ? "Unexpected input '" + unexpected.text + "'" : "Incomplete command",
         null,
         unexpected.text,
         unexpected.location
@@ -383,10 +383,13 @@ DryadJavaScriptExpression
   }
 
 DryadTestCommand
-  = "TEST" ____ expr:DryadValue {
+  = "TEST" expr:(____ DryadValue)? {
+    if (!expr) {
+      return {error: true};
+    }
     return {
       type: "test",
-      condition: expr
+      condition: expr[1]
     };
   }
 
