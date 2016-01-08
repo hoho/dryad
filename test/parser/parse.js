@@ -174,17 +174,29 @@ describe('Parser', function() {
             expect(getParsedCommand('[]')).to.deep.equal(getExpectedValueResult('[]', 'array'));
             expect(getParsedCommand('[1, "2", [3]]')).to.deep.equal(getExpectedValueResult('[1, "2", [3]]', 'array'));
             expect(getParsedCommand("[/\\(/.exec('(')[0], a.b.c, {d: {e: '/*f*///'}}]")).to.deep.equal(getExpectedValueResult("[/\\(/.exec('(')[0], a.b.c, {d: {e: '/*f*///'}}]", 'array'));
+            expect(function() { getParsedCommand('[] false'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'false'");
+            expect(function() { getParsedCommand('[] []'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '[]'");
+            expect(function() { getParsedCommand('[]{}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '{}'");
+            expect(function() { getParsedCommand('[]aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
         });
 
         it('should parse object literals', function() {
             expect(getParsedCommand('{}')).to.deep.equal(getExpectedValueResult('{}', 'object'));
             expect(getParsedCommand('{a: 1, b: "2", c: [3]}')).to.deep.equal(getExpectedValueResult('{a: 1, b: "2", c: [3]}', 'object'));
             expect(getParsedCommand("{a: /\\(/.exec('(')[0], b: a.b.c, c: {d: {e: '/*f*///'}}}")).to.deep.equal(getExpectedValueResult("{a: /\\(/.exec('(')[0], b: a.b.c, c: {d: {e: '/*f*///'}}}", 'object'));
+            expect(function() { getParsedCommand('{} null'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'null'");
+            expect(function() { getParsedCommand('{} {}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '{}'");
+            expect(function() { getParsedCommand('{}[]'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '[]'");
+            expect(function() { getParsedCommand('{}aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
         });
 
         it('should parse expressions in parenthesis', function() {
             expect(getParsedCommand('(1 + "2" + 3)')).to.deep.equal(getExpectedValueResult('(1 + "2" + 3)'));
             expect(getParsedCommand("(function() { return /\\(/.exec('(')[0]; })")).to.deep.equal(getExpectedValueResult("(function() { return /\\(/.exec('(')[0]; })"));
+            expect(function() { getParsedCommand('(1 + "2" + 3) null'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'null'");
+            expect(function() { getParsedCommand('(1 + "2" + 3) (4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '(4 + \"5\" + 6)'");
+            expect(function() { getParsedCommand('(1 + "2" + 3)(4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '(4 + \"5\" + 6)'");
+            expect(function() { getParsedCommand('(1 + "2" + 3)aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
         });
 
         it('should parse variable reference', function() {
