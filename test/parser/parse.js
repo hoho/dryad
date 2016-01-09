@@ -178,6 +178,7 @@ describe('Parser', function() {
             expect(function() { getParsedCommand('[] []'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '[]'");
             expect(function() { getParsedCommand('[]{}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '{}'");
             expect(function() { getParsedCommand('[]aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
+            expect(function() { getParsedCommand('['); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
         });
 
         it('should parse object literals', function() {
@@ -188,6 +189,7 @@ describe('Parser', function() {
             expect(function() { getParsedCommand('{} {}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '{}'");
             expect(function() { getParsedCommand('{}[]'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '[]'");
             expect(function() { getParsedCommand('{}aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
+            expect(function() { getParsedCommand('{'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
         });
 
         it('should parse expressions in parenthesis', function() {
@@ -197,11 +199,14 @@ describe('Parser', function() {
             expect(function() { getParsedCommand('(1 + "2" + 3) (4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '(4 + \"5\" + 6)'");
             expect(function() { getParsedCommand('(1 + "2" + 3)(4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '(4 + \"5\" + 6)'");
             expect(function() { getParsedCommand('(1 + "2" + 3)aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
+            expect(function() { getParsedCommand('('); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
         });
 
         it('should parse variable reference', function() {
             expect(getParsedCommand('$ololo')).to.deep.equal(getExpectedValueResult('$ololo', 'variable'));
             expect(getParsedCommand('$_')).to.deep.equal(getExpectedValueResult('$_', 'variable'));
+            expect(function() { getParsedCommand('$var1 $var2'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '$var2'");
+            expect(function() { getParsedCommand('$var1 hello'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'hello'");
         });
 
         it('should parse JSPath expressions', function() {
@@ -242,6 +247,10 @@ describe('Parser', function() {
             expect(getParsedCommand('<.books{.price > 19 && .author.name === "Robert C. Martin"}>')).to.deep.equal(getExpectedValueResult('.books{.price > 19 && .author.name === "Robert C. Martin"}', 'jspath'));
             expect(getParsedCommand('<.books{.title === "Maintainable JavaScript" || .title === "Clean Code"}>')).to.deep.equal(getExpectedValueResult('.books{.title === "Maintainable JavaScript" || .title === "Clean Code"}', 'jspath'));
             expect(getParsedCommand('<.books{!.title}>')).to.deep.equal(getExpectedValueResult('.books{!.title}', 'jspath'));
+
+            expect(function() { getParsedCommand('<.books{'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<.books{'");
+            expect(function() { getParsedCommand('<'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
+            expect(function() { getParsedCommand('<.books{}>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<.books{}>'");
         });
 
         it('should parse TEST command', function() {

@@ -330,8 +330,12 @@ DryadFunctionBody
 DryadCommandLine
   = spaces:" "+ ___ cmd:DryadCommand ___ unexpected:DryadUnexpectedTail ___ {
     if (cmd.error || unexpected.text.length) {
+      var message = cmd.error && cmd.message && cmd.message(unexpected.text);
+      if (!message) {
+        message = unexpected.text ? "Unexpected input '" + unexpected.text + "'" : "Incomplete command";
+      }
       throw peg$buildException(
-        unexpected.text ? "Unexpected input '" + unexpected.text + "'" : "Incomplete command",
+        message,
         null,
         unexpected.text,
         unexpected.location
@@ -511,12 +515,24 @@ DryadValue "dryad value"
     DryadJavaScriptExpression
   / DryadVariableName
   / DryadJSPathExpression
+  / DryadIncorrectValue
   ) {
+    if (value.error) {
+      return value;
+    }
     return {
       type: "value",
       value: value,
       location: location()
     };
+  }
+
+DryadIncorrectValue
+  = open:("(" / "[" / "{"/ "<") &DryadUnexpectedTail {
+    return {
+      error: true,
+      message: function(tail) { if (tail) { return "Malformed expression '" + open + tail + "'"; }}
+    }
   }
 
 DryadJSPathExpression "JSPath expression"
