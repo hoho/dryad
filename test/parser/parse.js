@@ -257,6 +257,10 @@ describe('Parser', function() {
             expect(getParsedCommand('TEST $ololo')).to.deep.equal(getExpectedTestResult('$ololo', 'variable'));
             expect(getParsedCommand('TEST <.a.b.c>\n TEST (false || true)')).to.deep.equal(getExpectedTestResult('.a.b.c', 'jspath', [getExpectedTestResult('(false || true)')]));
             expect(getParsedCommand('TEST <.a.b.c> /* Comment */ // Comment \n // Lalala\n  TEST /*Ololo*/ (false || true) // Haha')).to.deep.equal(getExpectedTestResult('.a.b.c', 'jspath', [getExpectedTestResult('(false || true)')]));
+
+            expect(function() { getParsedCommand('TEST'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
+            expect(function() { getParsedCommand('TEST abc true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc true'");
+            expect(function() { getParsedCommand('TEST <.books{}>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<.books{}>'");
         });
 
         it('should parse СHOOSE command', function() {
@@ -272,6 +276,14 @@ describe('Parser', function() {
             expect(getParsedCommand('CHOOSE\n  WHEN (1 + 2)')).to.deep.equal(getExpectedChooseResult([
                 getChooseConditionResult('(1 + 2)')
             ]));
+
+            expect(function() { getParsedCommand('CHOOSE /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
+            expect(function() { getParsedCommand('WHEN'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
+            expect(function() { getParsedCommand('WHEN (1 +'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '(1 +'");
+            expect(function() { getParsedCommand('WHEN /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
+            expect(function() { getParsedCommand('WHEN true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
+            expect(function() { getParsedCommand('OTHERWISE /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
+            expect(function() { getParsedCommand('OTHERWISE'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
         });
 
         it('should parse SET command', function() {

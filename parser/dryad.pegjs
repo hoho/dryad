@@ -267,6 +267,12 @@
       location
     );
   }
+
+  function getErrorValue(expr) {
+    if (!expr || expr.error) {
+       return expr || {error: true};
+    }
+  }
 }
 
 
@@ -387,13 +393,10 @@ DryadJavaScriptExpression
   }
 
 DryadTestCommand
-  = "TEST" expr:(____ DryadValue)? {
-    if (!expr) {
-      return {error: true};
-    }
-    return {
+  = "TEST" expr:DryadSpaceAndValue? {
+    return getErrorValue(expr) || {
       type: "test",
-      condition: expr[1]
+      condition: expr
     };
   }
 
@@ -401,7 +404,9 @@ DryadChooseCommand
   = "CHOOSE" { return {type: "choose"}; }
 
 DryadChooseWhenCommand
-  = "WHEN" ____ expr:DryadValue { return {type: "when", condition: expr}; }
+  = "WHEN" expr:DryadSpaceAndValue? {
+    return getErrorValue(expr) || {type: "when", condition: expr};
+  }
 
 DryadChooseOtherwiseCommand
   = "OTHERWISE" { return {type: "otherwise"}; }
@@ -429,13 +434,14 @@ DryadCallCommand
   }
 
 DryadEachCommand
-  = "EACH" key:(____ DryadVariableName !EOF)? value:(____ DryadVariableName !EOF)? source:(____ DryadValue)? {
-    if (!source) {
-      return {error: true};
+  = "EACH" key:(____ DryadVariableName !EOF)? value:(____ DryadVariableName !EOF)? source:DryadSpaceAndValue? {
+    var ret = getErrorValue(source);
+    if (ret) {
+      return ret;
     }
-    var ret = {
+    ret = {
       type: "each",
-      source: source[1]
+      source: source
     };
     if (key && !value) {
       value = key;
@@ -508,6 +514,11 @@ DryadKeyValueValue
     };
     if (value) { ret.value = value[1]; }
     return ret;
+  }
+
+DryadSpaceAndValue
+  = ____ value:DryadValue {
+    return value;
   }
 
 DryadValue "dryad value"
