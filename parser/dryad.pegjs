@@ -412,29 +412,60 @@ DryadChooseOtherwiseCommand
   = "OTHERWISE" { return {type: "otherwise"}; }
 
 DryadSetCommand
-  = "SET" ____ name:DryadVariableName value:(____ DryadValue)? {
+  = "SET" namevalue:(DryadSpaceAndVariableName DryadSpaceAndValue?)? {
+    if (!namevalue) {
+      return {error: true};
+    }
     var ret = {
       type: "set",
-      name: name.value
+      name: namevalue[0].value
     };
-    if (value) { ret.value = value[1]; }
+    if (namevalue[1]) {
+      ret.value = namevalue[1];
+      var error = getErrorValue(ret.value);
+      if (error) { return error; }
+    }
     return ret;
   }
 
 DryadCallCommand
-  = "CALL" ____ name:(DryadFunctionName / DryadValue) args:(____ DryadValue)* kwargs:(____ DryadArgumentName ___ "=" ___ DryadValue)* asvar:(____ "AS" ____ DryadVariableName)? {
+  = "CALL" call:(____ (!("AS" DryadSpaceAndVariableName ____ EOF) (DryadFunctionName / DryadValue)) (____ DryadValue)* (____ DryadArgumentName ___ "=" ___ DryadValue)* (____ "AS" DryadSpaceAndVariableName?)?)? {
+    var name = call[1][1],
+        args = call[2],
+        kwargs = call[3],
+        asvar = call[4];
+
     var ret = {
       type: "call",
       name: name,
       args: args.map(function(item) { return item[1]; }),
       kwargs: kwargs.map(function(item) { return {name: item[1].name, value: item[5]}; })
     };
-    if (asvar) { ret.asvar = asvar[3].value; }
+
+    var error;
+    [{value: name}].concat(ret.args).concat(ret.kwargs).some(function(item) {
+      item = item.value;
+      if (!error && item.error) {
+        error = item;
+        return true;
+      }
+    });
+    if (error) {
+      return error;
+    }
+
+    if (asvar) {
+      if (!asvar[2]) {
+        return {error: true};
+      }
+      ret.asvar = asvar[2].value;
+    }
+
     return ret;
   }
 
 DryadEachCommand
-  = "EACH" key:(____ DryadVariableName !EOF)? value:(____ DryadVariableName !EOF)? source:DryadSpaceAndValue? {
+  = "EACH" key:(DryadSpaceAndVariableName !EOF)? value:(DryadSpaceAndVariableName !EOF)? source:DryadSpaceAndValue? {
     var ret = getErrorValue(source);
     if (ret) {
       return ret;
@@ -447,8 +478,12 @@ DryadEachCommand
       value = key;
       key = undefined;
     }
-    if (key) { ret.key = key[1].value; }
-    if (value) { ret.value = value[1].value; }
+    if (key) {
+      ret.key = key[0].value;
+    }
+    if (value) {
+      ret.value = value[0].value;
+    }
     return ret;
   }
 
@@ -520,6 +555,11 @@ DryadSpaceAndValue
   = ____ value:DryadValue {
     return value;
   }
+
+DryadSpaceAndVariableName
+  = ____ name:DryadVariableName {
+    return name;
+}
 
 DryadValue "dryad value"
   = value:(

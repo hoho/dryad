@@ -290,6 +290,11 @@ describe('Parser', function() {
             expect(getParsedCommand('SET $tmp')).to.deep.equal(getExpectedSetResult('$tmp'));
             expect(getParsedCommand('SET $tmp 123')).to.deep.equal(getExpectedSetResult('$tmp', getExpectedValueResult('123').command));
             expect(getParsedCommand('SET $tmp\n  123')).to.deep.equal(getExpectedSetResult('$tmp', undefined, [getExpectedValueResult('123')]));
+
+            expect(function() { getParsedCommand('SET'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
+            expect(function() { getParsedCommand('SET 234'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '234'");
+            expect(function() { getParsedCommand('SET alala'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'alala'");
+            expect(function() { getParsedCommand('SET $a <>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<>'");
         });
 
         it('should parse CALL command', function() {
@@ -326,12 +331,23 @@ describe('Parser', function() {
                 ],
                 '$tmp'
             ));
+            expect(getParsedCommand('CALL AS $p1')).to.deep.equal(getExpectedCallResult('AS', [getExpectedValueResult('$p1', 'variable').command]));
+            expect(getParsedCommand('CALL AS $p1 AS $p2')).to.deep.equal(getExpectedCallResult('AS', [getExpectedValueResult('$p1', 'variable').command], [], '$p2'));
+
+            expect(function() { getParsedCommand('CALL <>') }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<>'");
+            expect(function() { getParsedCommand('CALL $a=1 $b=2 $c') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '=1 $b=2 $c'");
+            expect(function() { getParsedCommand('CALL $a $b=2 $c') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '=2 $c'");
+            expect(function() { getParsedCommand('CALL $a $b $c=<') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '=<'");
+            expect(function() { getParsedCommand('CALL $a $b c=(1') }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '(1'");
+            expect(function() { getParsedCommand('CALL aa AS $p1 $p2') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '$p2'");
+            expect(function() { getParsedCommand('CALL aa AS') }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
         });
 
         it('should parse EACH command', function() {
             expect(getParsedCommand('EACH $key $value [1, 2]')).to.deep.equal(getExpectedEachResult('$key', '$value', getExpectedValueResult('[1, 2]', 'array').command));
             expect(getParsedCommand('EACH $val ([])\n  $val')).to.deep.equal(getExpectedEachResult(undefined, '$val', getExpectedValueResult('([])', 'array').command, [getExpectedValueResult('$val', 'variable')]));
             expect(getParsedCommand('EACH $src')).to.deep.equal(getExpectedEachResult(undefined, undefined, getExpectedValueResult('$src', 'variable').command));
+
             expect(function() { getParsedCommand('EACH'); }).to.throw(dryad.SyntaxError, 'SyntaxError: Incomplete command');
             expect(function() { getParsedCommand('EACH abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
             expect(function() { getParsedCommand('EACH $a $b $c cde'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'cde'");
