@@ -204,10 +204,14 @@
     if (ok) {
       switch (newState.type) {
         case "expression":
+        case "variable":
+        case "jspath":
           newState.oneLiner = true;
         case "array":
         case "object":
-          if (prevState.type in {array: true, object: true}) { ok = false; }
+          if (prevState.type in {array: true, object: true}) {
+            ok = false;
+          }
           break;
         case "test":
           break;
@@ -215,10 +219,14 @@
           newState.allowed = {when: true, otherwise: true};
           break;
         case "when":
-          if (parentState.type !== "choose" || parentState.hasOtherwise) { ok = false; }
+          if (parentState.type !== "choose" || parentState.hasOtherwise) {
+            ok = false;
+          }
           break;
         case "otherwise":
-          if (parentState.type !== "choose" || parentState.hasOtherwise) { ok = false; }
+          if (parentState.type !== "choose" || parentState.hasOtherwise) {
+            ok = false;
+          }
           parentState.hasOtherwise = true;
           break;
         case "set":
@@ -231,23 +239,31 @@
         case "with":
           break;
         case "item":
-          if (prevState.type && (prevState.type !== "array")) { ok = false; }
+          if (prevState.type && (prevState.type !== "array") && (prevState.type !== "call")) {
+            ok = false;
+          }
           newState.oneLiner = !!newState.command.value;
           break;
-        case "kvpair":
-          if (prevState.type && (prevState.type !== "object")) { ok = false; }
+        case "kv":
+          if (prevState.type && (prevState.type !== "object") && (prevState.type !== "call")) {
+            ok = false;
+          }
           newState.hasKey = !!newState.command.key;
           newState.hasValue = !!newState.command.value;
           newState.oneLiner = newState.hasKey && newState.hasValue;
-          newState.allowed = {kvkey: true, kvvalue: true};
+          newState.allowed = {kvkey: true, kvval: true};
           break;
         case "kvkey":
-          if (parentState.type !== "kvpair" || parentState.hasKey) { ok = false; }
+          if (parentState.type !== "kv" || parentState.hasKey) {
+            ok = false;
+          }
           parentState.hasKey = true;
           newState.oneLiner = !!newState.command.key;
           break;
-        case "kvvalue":
-          if (parentState.type !== "kvpair" || parentState.hasValue) { ok = false; }
+        case "kvval":
+          if (parentState.type !== "kv" || parentState.hasValue) {
+            ok = false;
+          }
           parentState.hasValue = true;
           newState.oneLiner = !!newState.command.value;
           break;
@@ -323,7 +339,7 @@ DryadArgumentDeclaration
   }
 
 DryadArgumentNameDeclaration "dryad argument name declaration"
-  = "$" name:Identifier { return {name: name.name, location: location()}; }
+  = "$" name:IdentifierName { return {name: "$" + name.name, location: location()}; }
 
 DryadArgumentValueDeclaration "dryad argument value declaration"
   = DryadJavaScriptExpression
@@ -423,7 +439,9 @@ DryadSetCommand
     if (namevalue[1]) {
       ret.value = namevalue[1];
       var error = getErrorValue(ret.value);
-      if (error) { return error; }
+      if (error) {
+        return error;
+      }
     }
     return ret;
   }
@@ -488,17 +506,15 @@ DryadEachCommand
   }
 
 DryadWithCommand
-  = "WITH" ____ source:DryadValue {
-    var ret = {
+  = "WITH" context:DryadSpaceAndValue? {
+    return getErrorValue(context) || {
       type: "with",
-      name: name.name
+      context: context
     };
-    if (value) { ret.value = value[1]; }
-    return ret;
   }
 
 DryadVariableName "dryad variable name"
-  = "$" name:Identifier {
+  = "$" name:IdentifierName {
     return {
       type: "variable",
       value: "$" + name.name
@@ -506,48 +522,79 @@ DryadVariableName "dryad variable name"
   }
 
 DryadArgumentName "dryad argument name"
-  = name:Identifier {
+  = name:IdentifierName {
     return {
       type: "argument",
-      name: name.name,
+      name: "$" + name.name,
       location: location()
     };
   }
 
 DryadArrayItem
-  = "ITEM" value:(____ DryadValue)? {
+  = "ITEM" value:DryadSpaceAndValue? {
     var ret = {
       type: "item"
     };
-    if (value) { ret.value = value[1].name; }
+    if (value) {
+      var error = getErrorValue(value);
+      if (error) {
+        return error;
+      }
+      ret.value = value;
+    }
     return ret;
   }
 
 DryadKeyValuePair
-  = "PAIR" key:(____ DryadValue)? value:(____ DryadValue)? {
+  = "KEYVAL" key:DryadSpaceAndValue? value:DryadSpaceAndValue? {
+    var error;
     var ret = {
-      type: "kvpair"
+      type: "kv"
     };
-    if (key) { ret.key = key[1]; }
-    if (value) { ret.value = value[1]; }
+    if (key) {
+      error = getErrorValue(key);
+      if (error) {
+        return error;
+      }
+      ret.key = key;
+    }
+    if (value) {
+      error = getErrorValue(value);
+      if (error) {
+        return error;
+      }
+      ret.value = value;
+    }
     return ret;
   }
 
 DryadKeyValueKey
-  = "KEY" key:(____ DryadValue)? {
+  = "KEY" key:DryadSpaceAndValue? {
     var ret = {
       type: "kvkey"
     };
-    if (key) { ret.key = key[1]; }
+    if (key) {
+      var error = getErrorValue(key);
+      if (error) {
+        return error;
+      }
+      ret.key = key;
+    }
     return ret;
   }
 
 DryadKeyValueValue
-  = "VALUE" value:(____ DryadValue)? {
+  = "VAL" value:DryadSpaceAndValue? {
     var ret = {
-      type: "kvvalue"
+      type: "kvval"
     };
-    if (value) { ret.value = value[1]; }
+    if (value) {
+      var error = getErrorValue(value);
+      if (error) {
+        return error;
+      }
+      ret.value = value;
+    }
     return ret;
   }
 
@@ -611,10 +658,10 @@ DryadJSPathSelector
   = WhiteSpace* (DryadJSPathSelectorProperty / DryadJSPathSelectorVariable) WhiteSpace*
 
 DryadJSPathSelectorProperty
-  = "^"? WhiteSpace* (".." / ".") ("*" / Identifier / StringLiteral)
+  = "^"? WhiteSpace* (".." / ".") ("*" / IdentifierName / StringLiteral)
 
 DryadJSPathSelectorVariable
-  = "$" (Identifier / StringLiteral)
+  = "$" (IdentifierName / StringLiteral)
 
 DryadJSPathPredicate
   = DryadJSPathObjectPredicate
