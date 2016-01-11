@@ -354,7 +354,7 @@ DryadCommandLine
     if (cmd.error || unexpected.text.length) {
       var message = cmd.error && cmd.message && cmd.message(unexpected.text);
       if (!message) {
-        message = unexpected.text ? "Unexpected input '" + unexpected.text + "'" : "Incomplete command";
+        message = unexpected.text ? "Incorrect input '" + unexpected.text + "'" : "Incomplete command";
       }
       throw peg$buildException(
         message,
@@ -611,6 +611,7 @@ DryadSpaceAndVariableName
 DryadValue "dryad value"
   = value:(
     DryadJavaScriptExpression
+  / DryadVariableMemberExpression
   / DryadVariableName
   / DryadJSPathExpression
   / DryadIncorrectValue
@@ -723,6 +724,14 @@ ___
 ____
   = Comment* WhiteSpace+ ___
 
+DryadVariableMemberExpression
+  = name:DryadVariableName (__ "[" __ Expression __ "]" / __ "." __ IdentifierName)+ {
+    return {
+      type: "variableMember",
+      variable: name.value,
+      value: text()
+    };
+  }
 
 /* ----- A.1 Lexical Grammar ----- */
 

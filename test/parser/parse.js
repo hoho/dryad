@@ -167,8 +167,8 @@ describe('Parser', function() {
             expect(getParsedCommand('0x123')).to.deep.equal(getExpectedValue('0x123'));
             expect(getParsedCommand('/\\(/gi')).to.deep.equal(getExpectedValue('/\\(/gi'));
 
-            expect(function() { getParsedCommand('null aaa bbb'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aaa bbb'");
-            expect(function() { getParsedCommand('true false'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'false'");
+            expect(function() { getParsedCommand('null aaa bbb'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'aaa bbb'");
+            expect(function() { getParsedCommand('true false'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'false'");
             expect(function() { getParsedCommand('true\n  false'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('234\n  CALL aaa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
         });
@@ -179,10 +179,10 @@ describe('Parser', function() {
             expect(getParsedCommand("[/\\(/.exec('(')[0], a.b.c, {d: {e: '/*f*///'}}]")).to.deep.equal(getExpectedValue("[/\\(/.exec('(')[0], a.b.c, {d: {e: '/*f*///'}}]", 'array'));
             expect(getParsedCommand('[]\n  CALL test')).to.deep.equal(getExpectedValue('[]', 'array', [getExpectedCall('test')]));
 
-            expect(function() { getParsedCommand('[] false'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'false'");
-            expect(function() { getParsedCommand('[] []'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '[]'");
-            expect(function() { getParsedCommand('[]{}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '{}'");
-            expect(function() { getParsedCommand('[]aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
+            expect(function() { getParsedCommand('[] false'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'false'");
+            expect(function() { getParsedCommand('[] []'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '[]'");
+            expect(function() { getParsedCommand('[]{}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '{}'");
+            expect(function() { getParsedCommand('[]aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'aa'");
             expect(function() { getParsedCommand('['); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
             expect(function() { getParsedCommand('[]\n  $aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('[]\n  KEYVAL'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
@@ -194,10 +194,10 @@ describe('Parser', function() {
             expect(getParsedCommand("{a: /\\(/.exec('(')[0], b: a.b.c, c: {d: {e: '/*f*///'}}}")).to.deep.equal(getExpectedValue("{a: /\\(/.exec('(')[0], b: a.b.c, c: {d: {e: '/*f*///'}}}", 'object'));
             expect(getParsedCommand('{}\n  CALL test')).to.deep.equal(getExpectedValue('{}', 'object', [getExpectedCall('test')]));
 
-            expect(function() { getParsedCommand('{} null'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'null'");
-            expect(function() { getParsedCommand('{} {}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '{}'");
-            expect(function() { getParsedCommand('{}[]'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '[]'");
-            expect(function() { getParsedCommand('{}aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
+            expect(function() { getParsedCommand('{} null'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'null'");
+            expect(function() { getParsedCommand('{} {}'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '{}'");
+            expect(function() { getParsedCommand('{}[]'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '[]'");
+            expect(function() { getParsedCommand('{}aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'aa'");
             expect(function() { getParsedCommand('{'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
             expect(function() { getParsedCommand('{}\n  $aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  ITEM'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
@@ -207,10 +207,10 @@ describe('Parser', function() {
             expect(getParsedCommand('(1 + "2" + 3)')).to.deep.equal(getExpectedValue('(1 + "2" + 3)'));
             expect(getParsedCommand("(function() { return /\\(/.exec('(')[0]; })")).to.deep.equal(getExpectedValue("(function() { return /\\(/.exec('(')[0]; })"));
 
-            expect(function() { getParsedCommand('(1 + "2" + 3) null'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'null'");
-            expect(function() { getParsedCommand('(1 + "2" + 3) (4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '(4 + \"5\" + 6)'");
-            expect(function() { getParsedCommand('(1 + "2" + 3)(4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '(4 + \"5\" + 6)'");
-            expect(function() { getParsedCommand('(1 + "2" + 3)aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'aa'");
+            expect(function() { getParsedCommand('(1 + "2" + 3) null'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'null'");
+            expect(function() { getParsedCommand('(1 + "2" + 3) (4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '(4 + \"5\" + 6)'");
+            expect(function() { getParsedCommand('(1 + "2" + 3)(4 + "5" + 6)'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '(4 + \"5\" + 6)'");
+            expect(function() { getParsedCommand('(1 + "2" + 3)aa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'aa'");
             expect(function() { getParsedCommand('('); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
             expect(function() { getParsedCommand('(1 + 2)\n  TEST true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
         });
@@ -219,10 +219,19 @@ describe('Parser', function() {
             expect(getParsedCommand('$ololo')).to.deep.equal(getExpectedValue('$ololo', 'variable'));
             expect(getParsedCommand('$_')).to.deep.equal(getExpectedValue('$_', 'variable'));
 
-            expect(function() { getParsedCommand('$var1 $var2'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '$var2'");
-            expect(function() { getParsedCommand('$var1 hello'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'hello'");
+            expect(function() { getParsedCommand('$var1 $var2'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '$var2'");
+            expect(function() { getParsedCommand('$var1 hello'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'hello'");
             expect(function() { getParsedCommand('$var1\n  "hello"'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('$var\n  CALL aaa'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
+        });
+
+        it('should parse variable with member expression', function() {
+            expect(getParsedCommand('$ololo.a.b["cc"].d[1]')).to.deep.equal(getExpectedVariableMemberValue('$ololo', '$ololo.a.b["cc"].d[1]'));
+            expect(getParsedCommand('$ololo   \n    \n .a \n.b[\n"cc"\n  ]\n   .d[  1\n]')).to.deep.equal(getExpectedVariableMemberValue('$ololo', '$ololo   \n        \n     .a \n    .b[\n    "cc"\n      ]\n       .d[  1\n    ]'));
+            expect(getParsedCommand('$ololo[12]')).to.deep.equal(getExpectedVariableMemberValue('$ololo', '$ololo[12]'));
+
+            expect(function() { getParsedCommand('$var.'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '.'");
+            expect(function() { getParsedCommand('$var['); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '['");
         });
 
         it('should parse JSPath expressions', function() {
@@ -277,7 +286,7 @@ describe('Parser', function() {
             expect(getParsedCommand('TEST <.a.b.c> /* Comment */ // Comment \n // Lalala\n  TEST /*Ololo*/ (false || true) // Haha')).to.deep.equal(getExpectedTest('.a.b.c', 'jspath', [getExpectedTest('(false || true)')]));
 
             expect(function() { getParsedCommand('TEST'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
-            expect(function() { getParsedCommand('TEST abc true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc true'");
+            expect(function() { getParsedCommand('TEST abc true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'abc true'");
             expect(function() { getParsedCommand('TEST <.books{}>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<.books{}>'");
         });
 
@@ -295,12 +304,12 @@ describe('Parser', function() {
                 getChooseCondition('(1 + 2)')
             ]));
 
-            expect(function() { getParsedCommand('CHOOSE /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
+            expect(function() { getParsedCommand('CHOOSE /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'abc'");
             expect(function() { getParsedCommand('WHEN'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
             expect(function() { getParsedCommand('WHEN (1 +'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '(1 +'");
-            expect(function() { getParsedCommand('WHEN /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
+            expect(function() { getParsedCommand('WHEN /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'abc'");
             expect(function() { getParsedCommand('WHEN true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
-            expect(function() { getParsedCommand('OTHERWISE /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
+            expect(function() { getParsedCommand('OTHERWISE /* Comment */ abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'abc'");
             expect(function() { getParsedCommand('OTHERWISE'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('CHOOSE\n  CALL test'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('CHOOSE\n  SET $a 1'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
@@ -314,10 +323,10 @@ describe('Parser', function() {
             expect(getParsedCommand('SET $tmp\n  123')).to.deep.equal(getExpectedSet('$tmp', undefined, [getExpectedValue('123')]));
 
             expect(function() { getParsedCommand('SET'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
-            expect(function() { getParsedCommand('SET 234'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '234'");
-            expect(function() { getParsedCommand('SET alala'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'alala'");
+            expect(function() { getParsedCommand('SET 234'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '234'");
+            expect(function() { getParsedCommand('SET alala'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'alala'");
             expect(function() { getParsedCommand('SET $a <>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<>'");
-            expect(function() { getParsedCommand('SET $tmp null 123'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '123'");
+            expect(function() { getParsedCommand('SET $tmp null 123'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '123'");
         });
 
         it('should parse CALL command', function() {
@@ -358,11 +367,11 @@ describe('Parser', function() {
             expect(getParsedCommand('CALL AS $p1 AS $p2')).to.deep.equal(getExpectedCall('AS', [getExpectedValue('$p1', 'variable').command], [], '$p2'));
 
             expect(function() { getParsedCommand('CALL <>') }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<>'");
-            expect(function() { getParsedCommand('CALL $a=1 $b=2 $c') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '=1 $b=2 $c'");
-            expect(function() { getParsedCommand('CALL $a $b=2 $c') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '=2 $c'");
-            expect(function() { getParsedCommand('CALL $a $b $c=<') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '=<'");
+            expect(function() { getParsedCommand('CALL $a=1 $b=2 $c') }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '=1 $b=2 $c'");
+            expect(function() { getParsedCommand('CALL $a $b=2 $c') }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '=2 $c'");
+            expect(function() { getParsedCommand('CALL $a $b $c=<') }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '=<'");
             expect(function() { getParsedCommand('CALL $a $b c=(1') }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '(1'");
-            expect(function() { getParsedCommand('CALL aa AS $p1 $p2') }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '$p2'");
+            expect(function() { getParsedCommand('CALL aa AS $p1 $p2') }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '$p2'");
             expect(function() { getParsedCommand('CALL aa AS') }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
         });
 
@@ -372,9 +381,9 @@ describe('Parser', function() {
             expect(getParsedCommand('EACH $src')).to.deep.equal(getExpectedEach(undefined, undefined, getExpectedValue('$src', 'variable').command));
 
             expect(function() { getParsedCommand('EACH'); }).to.throw(dryad.SyntaxError, 'SyntaxError: Incomplete command');
-            expect(function() { getParsedCommand('EACH abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
-            expect(function() { getParsedCommand('EACH $a $b $c cde'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'cde'");
-            expect(function() { getParsedCommand('EACH $a cde $b'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'cde $b'");
+            expect(function() { getParsedCommand('EACH abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'abc'");
+            expect(function() { getParsedCommand('EACH $a $b $c cde'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'cde'");
+            expect(function() { getParsedCommand('EACH $a cde $b'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'cde $b'");
         });
 
         it('should parse WITH command', function() {
@@ -383,7 +392,7 @@ describe('Parser', function() {
             expect(getParsedCommand('WITH <.a.b.c> /* Comment */ // Comment \n // Lalala\n  WITH /*Ololo*/ (false || true) // Haha')).to.deep.equal(getExpectedWith('.a.b.c', 'jspath', [getExpectedWith('(false || true)')]));
 
             expect(function() { getParsedCommand('WITH'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incomplete command");
-            expect(function() { getParsedCommand('WITH abc true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc true'");
+            expect(function() { getParsedCommand('WITH abc true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'abc true'");
             expect(function() { getParsedCommand('WITH <.books{}>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<.books{}>'");
         });
 
@@ -395,7 +404,7 @@ describe('Parser', function() {
             expect(getParsedCommand('CALL test\n  ITEM 789')).to.deep.equal(getExpectedCall('test', [], [], undefined, [getExpectedItem(getExpectedValue('789').command)]));
 
             expect(function() { getParsedCommand('[]\n  ITEM <>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<>'");
-            expect(function() { getParsedCommand('[]\n  ITEM 567 678'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '678'");
+            expect(function() { getParsedCommand('[]\n  ITEM 567 678'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '678'");
             expect(function() { getParsedCommand('ITEM 456\n  ITEM true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  ITEM true'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
         });
@@ -411,17 +420,17 @@ describe('Parser', function() {
 
             expect(function() { getParsedCommand('{}\n  KEYVAL <>'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '<>'");
             expect(function() { getParsedCommand('{}\n  KEYVAL 123 ()'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '()'");
-            expect(function() { getParsedCommand('{}\n  KEYVAL abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input 'abc'");
-            expect(function() { getParsedCommand('{}\n  KEYVAL 123 234 345'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '345'");
-            expect(function() { getParsedCommand('{}\n  KEYVAL 123 234 345'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '345'");
+            expect(function() { getParsedCommand('{}\n  KEYVAL abc'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input 'abc'");
+            expect(function() { getParsedCommand('{}\n  KEYVAL 123 234 345'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '345'");
+            expect(function() { getParsedCommand('{}\n  KEYVAL 123 234 345'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '345'");
             expect(function() { getParsedCommand('{}\n  KEYVAL 123 234\n    KEY 345'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  KEYVAL 123 234\n    VAL 345'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  KEYVAL 123\n    KEY 345'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  KEYVAL\n    KEY ()'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '()'");
-            expect(function() { getParsedCommand('{}\n  KEYVAL\n    KEY 123 234'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '234'");
+            expect(function() { getParsedCommand('{}\n  KEYVAL\n    KEY 123 234'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '234'");
             expect(function() { getParsedCommand('{}\n  KEYVAL\n    KEY "aa"\n      "bb"'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  KEYVAL\n    VAL ()'); }).to.throw(dryad.SyntaxError, "SyntaxError: Malformed expression '()'");
-            expect(function() { getParsedCommand('{}\n  KEYVAL\n    VAL 123 234'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected input '234'");
+            expect(function() { getParsedCommand('{}\n  KEYVAL\n    VAL 123 234'); }).to.throw(dryad.SyntaxError, "SyntaxError: Incorrect input '234'");
             expect(function() { getParsedCommand('{}\n  KEYVAL\n    VAL "aa"\n      "bb"'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  KEYVAL\n    KEY\n    KEY'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
             expect(function() { getParsedCommand('{}\n  KEYVAL\n    VAL\n    VAL'); }).to.throw(dryad.SyntaxError, "SyntaxError: Unexpected command");
@@ -442,6 +451,12 @@ describe('Parser', function() {
                 },
                 children: children || []
             };
+        }
+
+        function getExpectedVariableMemberValue(variable, expr) {
+            var ret = getExpectedValue(expr, 'variableMember');
+            ret.command.value.variable =  variable;
+            return ret;
         }
 
         function getExpectedTest(conditionExpr, conditionType, children) {
