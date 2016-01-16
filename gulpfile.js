@@ -7,9 +7,9 @@ const PEG = require('pegjs');
 const fs = require('fs');
 
 gulp.task('build', function() {
-    const src = fs.readFileSync('parser/dryad.pegjs', {encoding: 'utf8'});
+    const src = fs.readFileSync('lib/parser.pegjs', {encoding: 'utf8'});
     const parser = PEG.buildParser(src, {output: 'source'});
-    fs.writeFileSync('parser/dryad.js', 'module.exports = ' + parser + ';\n', {encoding: 'utf8'});
+    fs.writeFileSync('lib/parser.js', 'module.exports = ' + parser + ';\n', {encoding: 'utf8'});
 });
 
 gulp.task('test', function() {
